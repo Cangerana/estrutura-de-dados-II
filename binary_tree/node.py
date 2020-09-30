@@ -1,7 +1,7 @@
 class Node:
-    def __init__(self, value, parant=None, left=None, right=None):
+    def __init__(self, value, parent=None, left=None, right=None):
         self.value = value
-        self.parant = parant
+        self.parent = parent
         self.left = left
         self.right = right
 

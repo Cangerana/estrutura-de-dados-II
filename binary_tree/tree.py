@@ -25,84 +25,79 @@ class BinaryTree:
         if self.is_empty():
             self.root = node
         else:
-            parant = self.root
+            parent = self.root
             while True:
-                if value < parant.value:
-                    if parant.left:
-                        parant = parant.left
+                if value < parent.value:
+                    if parent.left:
+                        parent = parent.left
                     else:
-                        node.parant = parant
-                        parant.left = node
+                        node.parent = parent
+                        parent.left = node
                         break
                 else:
-                    if parant.right:
-                        parant = parant.right
+                    if parent.right:
+                        parent = parent.right
                     else:
-                        node.parant = parant
-                        parant.right = node
+                        node.parent = parent
+                        parent.right = node
                         break
 
     def remove(self, value):
-        if self.is_empty():
-            print('Tree is empty!')
+        node = self.search(value)
+        if node:
+            self._remove(node)
         else:
-            node = self.root
-            while True:
-                if node.value == value:
-                    self._remove(node)
-                    break
-                elif node.value < value:
-                    if node.right:
-                        node = node.right
-                    else:
-                        print(f'Node [{value:^6}] isent\'t in tree!')
-                        break
-                else:
-                    if node.left:
-                        node = node.left
-                    else:
-                        print(f'Node [{value:^6}] isent\'t in tree!')
-                        break
+            print(f'Node [ {value} ] isen\'t in tree!')
 
     def _remove(self, node):
-        parant = node.parant
-        left = right = False
+        print(node.parent)
+        parent = node.parent
+        child = None
 
-        if node.parant:
-            if parant.value > node.value:
-                left = True
-            else:
-                right = True
-
-        if node.left and node.right:
-            new_node = self.max_left(node)
+        # Have one child on left
+        if node.left and not node.right:
+            child = node.left
+        # Have one child on right
+        elif not node.left and node.right:
+            child = node.right
+        # Have two childs on left and right
+        elif node.left and node.right:
+            child = self.max_left(node)
             if node.left:
-                node.left.parant = new_node
-            node.right.parant = new_node
+                child.left = node.left
+            if node.right:
+                child.right = node.right
 
-            new_node.parant = parant
-            new_node.left = node.left
-            new_node.right = node.right
+        if child:
+            child.parent = parent
+            if child.left:
+                child.left.parent = child
 
-        elif node.left:
-            new_node = node.left
-            new_node.parant = parant
+            if child.right:
+                child.right.parent = child
 
-        elif node.right:
-            new_node = node.right
-            new_node.parant = parant
-
+        if parent:
+            if self.is_left(node):
+                parent.left = child
+            else:
+                parent.right = child
         else:
-            new_node = None
-
-        if left:
-            parant.left = new_node
-        elif right:
-            parant.right = new_node
-        else:
-            self.root = new_node
+            self.root = child
 
         del node
+
+# ------------- ==== TOOS ==== -------------#
+
+    def search(self, value):
+        node = self.root
+        while node:
+            if node.value == value:
+                return node
+            elif node.value > value:
+                node = node.left
+            else:
+                node = node.right
+        return node
 
     def max_left(self, node, remove=True):
         max = node.left
@@ -110,10 +105,7 @@ class BinaryTree:
             max = max.right
 
         if remove:
-            if max is not node.left:
-                max.parant.right = None
-            else:
-                node.left = None
+            self._remove(max)
         return max
 
     def recursion_remove(self):
@@ -121,10 +113,12 @@ class BinaryTree:
         while not self.is_empty():
             node = self.root
             print('='*50 + f'\nremoving -> {node}\n' + '='*50)
+            self.remove(node.value)
             count += 1
-            self._remove(node)
-            # self.pre_ordem()
         print(count)
+
+    def is_left(self, node):
+        return node.parent.left is node
 
 
 if __name__ == '__main__':
